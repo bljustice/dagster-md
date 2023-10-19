@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.dagster]
+module_name = "dagstermd"
+
+[tool.setuptools.packages.find]
+include = ["dagstermd"]
+exclude = ["dagstermd_tests"]
+
+[project]
+name = "dagstermd"
+version = "0.0.1"
+requires-python = ">=3.7"
+dependencies = [
+    "dagster",
+    "dagster-cloud",
+    "dagster-dbt",
+    "dagster-duckdb-pandas",
+    "dbt-core",
+    "dbt-duckdb",
+    "ynab-sdk-python@git+https://github.com/bljustice/ynab-sdk-python.git@master"
+]
+
+[project.optional-dependencies]
+dev = ["dagster-webserver", "pytest"]
+

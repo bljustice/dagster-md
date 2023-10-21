@@ -48,3 +48,10 @@ def ynab_transactions(ynab_api: YnabClientResource) -> pd.DataFrame:
     ]
     transactions_df = pd.DataFrame(needed_data)
     return transactions_df
+
+@asset(compute_kind='duckdb', io_manager_key='source_io_manager')
+def ynab_payees(ynab_api: YnabClientResource) -> pd.DataFrame:
+    budget_result = ynab_api.get_budgets_data()
+    payees = budget_result.get('data').get('budget').get('payees')
+    payees_df = pd.DataFrame(payees)
+    return payees_df

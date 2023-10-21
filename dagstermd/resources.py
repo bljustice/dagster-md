@@ -25,3 +25,4 @@ class YnabClientResource(ConfigurableResource):
     def get_transactions_data(self) -> dict[str, Any]:
         client = Transactions(self.personal_token)
         return client.get_transactions_by_budget_id(self.budget_id)
+    

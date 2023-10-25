@@ -5,19 +5,21 @@ from dagstermd.resources import YnabClientResource
 @asset(compute_kind='duckdb', io_manager_key='source_io_manager')
 def ynab_accounts(ynab_api: YnabClientResource) -> pd.DataFrame:
     accounts_result = ynab_api.get_accounts_data()
-    needed_fields = accounts_result.get('data').get('accounts')[0]
-    accounts_df = pd.DataFrame([{
-        'id': needed_fields.get('id'),
-        'name': needed_fields.get('name'),
-        'type': needed_fields.get('type'),
-        'on_budget': needed_fields.get('on_budget'),
-        'closed': needed_fields.get('closed'),
-        'balance': needed_fields.get('balance'),
-        'cleared_balance': needed_fields.get('cleared_balance'),
-        'uncleared_balance': needed_fields.get('uncleared_balance'),
-        'deleted': needed_fields.get('deleted'),
-        'data_insertion_timestamp': pd.Timestamp.now()  
-    }])
+    accounts_df = pd.DataFrame([
+        {
+            'id': n.get('id'),
+            'name': n.get('name'),
+            'type': n.get('type'),
+            'on_budget': n.get('on_budget'),
+            'closed': n.get('closed'),
+            'balance': n.get('balance'),
+            'cleared_balance': n.get('cleared_balance'),
+            'uncleared_balance': n.get('uncleared_balance'),
+            'deleted': n.get('deleted'),
+            'data_insertion_timestamp': pd.Timestamp.now()  
+        }
+        for n in accounts_result.get('data').get('accounts')
+    ])
     return accounts_df
 
 @asset(compute_kind='duckdb', io_manager_key='source_io_manager')
@@ -33,20 +35,7 @@ def ynab_categories(ynab_api: YnabClientResource) -> pd.DataFrame:
 @asset(compute_kind='duckdb', io_manager_key='source_io_manager')
 def ynab_transactions(ynab_api: YnabClientResource) -> pd.DataFrame:
     transactions_result = ynab_api.get_transactions_data()
-    needed_fields = [
-        f for t in transactions_result.get('data').get('transactions')
-        for f in t
-        if f != 'subtransactions'
-    ]
-    needed_data = [
-        {
-            k: x[k]
-            for x in transactions_result.get('data').get('transactions')
-            for k in x
-            if k in needed_fields
-        }
-    ]
-    transactions_df = pd.DataFrame(needed_data)
+    transactions_df = pd.DataFrame(transactions_result.get('data').get('transactions'))
     return transactions_df
 
 @asset(compute_kind='duckdb', io_manager_key='source_io_manager')

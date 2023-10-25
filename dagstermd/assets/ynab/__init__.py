@@ -35,20 +35,6 @@ def ynab_categories(ynab_api: YnabClientResource) -> pd.DataFrame:
 @asset(compute_kind='duckdb', io_manager_key='source_io_manager')
 def ynab_transactions(ynab_api: YnabClientResource) -> pd.DataFrame:
     transactions_result = ynab_api.get_transactions_data()
-    needed_fields = [
-        f for t in transactions_result.get('data').get('transactions')
-        for f in t
-        if f != 'subtransactions'
-    ]
-    needed_data = [
-        {
-            k: x[k]
-            for x in transactions_result.get('data').get('transactions')
-            for k in x
-            if k in needed_fields
-        }
-    ]
-    # transactions_df = pd.DataFrame(needed_data)
     transactions_df = pd.DataFrame(transactions_result.get('data').get('transactions'))
     return transactions_df
 
